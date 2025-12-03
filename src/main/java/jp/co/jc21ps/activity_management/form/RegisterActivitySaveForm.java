@@ -29,6 +29,10 @@ public class RegisterActivitySaveForm {
      */
 
     private String activityName;
+        @NotBlank(message = "{NotBlank}")
+        @Size(max = 31,message = "{size}")
+
+        
 
     // 活動日
     /*
@@ -38,6 +42,8 @@ public class RegisterActivitySaveForm {
      */
 
     private String activityDate;
+        @NotBlank(message = "{NotBlank}")
+        @DateTimeFormat(pattern = "{DateTimeFormat}")
 
     // 過去の日付が入力されたとき
     @AssertTrue(message = "{AssertTrue.activityDate}")
@@ -62,6 +68,8 @@ public class RegisterActivitySaveForm {
      */
 
     private String activityPlace;
+        @NotBlank(message = "{NotBlank}")
+        @Size(max = 31,message = "{size}")
 
     /*
      * TODO ➍ activityStartTimeに対し、バリデーションの条件を付与する
@@ -71,6 +79,7 @@ public class RegisterActivitySaveForm {
 
     @Pattern(regexp = "^(?:[01]\\d|2[0-3]):[0-5]\\d$", message = "{Pattern.activityStartTime}") // hh:mm形式
     private String activityStartTime;
+        @NotBlank(message = "{NotBlank}")
 
     // 活動時間(至)
     /*
@@ -80,6 +89,7 @@ public class RegisterActivitySaveForm {
 
     @Pattern(regexp = "^(?:[01]\\d|2[0-3]):[0-5]\\d$", message = "{Pattern.activityEndTime}") // hh:mm形式
     private String activityEndTime;
+        @NotBlank(message = "{NotBlank}")
 
     // 時間の前後関係チェック
     @AssertTrue(message = "{AssertTrue}")
@@ -113,6 +123,8 @@ public class RegisterActivitySaveForm {
      */
 
     private String activityDescription;
+         @NotBlank(message = "{NotBlank}")
+        @Size(max = 31,message = "{size}")
 
     // 募集人数
     /*
@@ -125,6 +137,9 @@ public class RegisterActivitySaveForm {
     @Pattern(regexp = "^[0-9]*$", message = "{Pattern.maxParticipant}") // 半角数字
 
     private String maxParticipant;
+        @NotBlank(message = "{NotBlank}")
+        @Min(value = 1, message = "{Min}")
+        @Max(value = 100, message = "{Max}")
 
     private String message;
 

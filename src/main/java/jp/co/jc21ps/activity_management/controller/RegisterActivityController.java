@@ -80,20 +80,23 @@ public class RegisterActivityController {
         /*
          * TODO ➊ セッションからuserIdを取得する
          */
+        SessionDto  sessionDto = commonService.getSessionDto(session);
+        String leaderUserID = sessionDto.getUserId();
+
 
         // バリデーションエラー
         if (bindingResult.hasErrors()) {
             mav.addObject("registerActivitySaveForm", paramForm);
-//             mav.addObject("leaderClubId", leaderClubId);
+                mav.addObject("leaderClubId", leaderUserID);
             mav.setViewName("registerActivity");
             return mav;
-        }
+        } 
 
         // セッションが切れた場合、エラー画面に遷移
-//         if (leaderClubId.isEmpty()) {
-//             mav.setViewName("error");
-//             return mav;
-//         }
+            if (leaderUserID.isEmpty()) {
+                mav.setViewName("error");
+                return mav;
+            }
 
         try {
             // インスタンス化
@@ -102,6 +105,19 @@ public class RegisterActivityController {
             /*
              * TODO ➋ activitySaveDtoに、パラメータをsetする。
              */
+             activitySaveDto.setActivityDate(paramForm.getActivityDate());
+             activitySaveDto.setActivityName(paramForm.getActivityName());
+             activitySaveDto.setActivityPlace(paramForm.getActivityPlace());
+             activitySaveDto.setActivityStartTime(paramForm.getActivityStartTime());
+             activitySaveDto.setActivityEndTime(paramForm.getActivityEndTime());
+             activitySaveDto.setActivityDescription(paramForm.getActivityDescription());
+             activitySaveDto.setClubId(paramForm.getClubId());
+             activitySaveDto.setMaxParticipant(paramForm.getMaxParticipant());
+
+
+
+
+
 
             // サービスからinsertメソッドを呼び出す
             String resultMessageKey = registerActivityService.insertActivity(activitySaveDto);
@@ -111,16 +127,16 @@ public class RegisterActivityController {
                     Locale.getDefault());
 
             // 活動登録に成功した場合、トップ画面に遷移
-//             if ("activityRegisterCompleteMessage".equals(resultMessageKey)) {
-//                 redirectAttributes.addFlashAttribute("activityRegisterCompleteMessage", resultMessage);
-//                 mav.addObject("leaderClubId", leaderClubId);
-//                 mav.setViewName("redirect:/top");
-//                 return mav;
+            if ("activityRegisterCompleteMessage".equals(resultMessageKey)) {
+                redirectAttributes.addFlashAttribute("activityRegisterCompleteMessage", resultMessage);
+                mav.addObject("leaderClubId", leaderUserID);
+                mav.setViewName("redirect:/top");
+                return mav;
 
-//             } else {
-//                 // 活動登録に失敗した場合、エラー画面に遷移
-//                 mav.setViewName("error");
-//             }
+            } else {
+                // 活動登録に失敗した場合、エラー画面に遷移
+                mav.setViewName("error");
+            }
 
         } catch (Exception e) {
             // DB接続に失敗した場合、エラー画面に遷移
