@@ -38,50 +38,62 @@ public class ParticipantListController {
 
         ModelAndView mav = new ModelAndView();
 
-        // 活動IDが存在しない場合、エラー画面に遷移
-        if (activityId.isEmpty()) {
-            mav.setViewName("error");
-            return mav;
-        }
-
-        /*
-         * TODO ➊ セッションからuserId, clubIdを取得
-         */
-
-        String userId = (String) session.getAttribute("user_id");
-        String clubId = (String) session.getAttribute("club_id");    
-        // セッションが切れた場合、エラー画面に遷移
-//         if (userId.isEmpty()) {
-//             mav.setViewName("error");
-//             return mav;
-//         }
-
-        /*
-         * ➋TODO dtoに値をセット
-         */
-
         try {
-            // ➌TODO participantListServiceのgetParticipantListDataメソッドを呼び出す。
+            // 活動IDが存在しない場合、エラー画面に遷移
+            if (activityId == null || activityId.isEmpty()) {
+                mav.setViewName("error");
+                return mav;
+            }
+
+            // ➊ セッションからuserId, clubIdを取得
+            SessionDto sessionDto = commonService.getSessionDto(session);
+            String userId = sessionDto.getUserId();
+            String clubId = sessionDto.getClubId();
+            
+            // セッションが切れた場合、エラー画面に遷移
+            if (userId == null || userId.isEmpty()) {
+                mav.setViewName("error");
+                return mav;
+            }
+
+            // ➋ dtoに値をセット
+            ParticipantListDto paramDto = new ParticipantListDto();
+            paramDto.setActivityId(activityId);
+            paramDto.setUserId(userId);
+
+            // ➌ participantListServiceのgetParticipantListDataメソッドを呼び出す。
+            ParticipantDto responseDto = participantListService.getParticipantListData(paramDto);
 
             // 返却用のリスト
             List<ParticipantListForm> responseListForm = new ArrayList<>();
 
-            /*
-             * ➍ TODO responseListFormに値をセット
-             */
+            // ➍ responseListFormに値をセット
+            if (responseDto.getPariticipantListDto() != null) {
+                for (ParticipantListDto dto : responseDto.getPariticipantListDto()) {
+                    ParticipantListForm form = new ParticipantListForm();
+                    form.setActivityId(dto.getActivityId());
+                    form.setUserId(dto.getUserId());
+                    form.setActivityName(dto.getActivityName());
+                    form.setUserName(dto.getUserName());
+                    responseListForm.add(form);
+                }
+            }
 
-            /*
-             * ➎ TODO 取得したデータを画面側に渡す。
-             */
+            // ➎ 取得したデータを画面側に渡す。
+            mav.addObject("participantList", responseListForm);
+            mav.addObject("activityName", responseDto.getActivityName());
 
             // messages.propertiesからメッセージを取得
             String resultMessage = messageSource.getMessage("notpariticipant", null, Locale.getDefault());
             mav.addObject("message", resultMessage);
-//             mav.addObject("leaderClubId", leaderClubId);
+            mav.addObject("clubId", clubId);
 
             // 遷移先の設定
             mav.setViewName("participantList");
         } catch (Exception e) {
+            // エラーの詳細をログに出力（デバッグ用）
+            e.printStackTrace();
+            // DB接続に失敗した場合、エラー画面に遷移
             mav.setViewName("error");
         }
 
