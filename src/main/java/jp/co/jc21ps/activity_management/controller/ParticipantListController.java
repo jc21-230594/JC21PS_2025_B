@@ -48,6 +48,8 @@ public class ParticipantListController {
          * TODO ➊ セッションからuserId, clubIdを取得
          */
 
+        String userId = (String) session.getAttribute("user_id");
+        String clubId = (String) session.getAttribute("club_id");    
         // セッションが切れた場合、エラー画面に遷移
 //         if (userId.isEmpty()) {
 //             mav.setViewName("error");
